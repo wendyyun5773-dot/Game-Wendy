@@ -1,0 +1,410 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>특가 승인 요청 생성기</title>
+  <style>
+    :root {
+      font-family: "Apple SD Gothic Neo", "Malgun Gothic", "맑은 고딕", sans-serif;
+      background: #e7edf8;
+      color: #111827;
+      line-height: 1.5;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #e7edf8;
+      color: #111827;
+    }
+
+    .page {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .hero {
+      padding: 28px 24px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, #2d60d3 0%, #5c8ff0 100%);
+      color: #ffffff;
+      text-align: center;
+      box-shadow: 0 24px 80px rgba(45, 96, 211, 0.18);
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(2.4rem, 4vw, 3.2rem);
+      letter-spacing: -0.04em;
+    }
+
+    .hero p {
+      margin: 16px auto 0;
+      max-width: 760px;
+      font-size: 1rem;
+      opacity: 0.92;
+    }
+
+    .panel {
+      margin-top: 24px;
+      display: grid;
+      gap: 24px;
+    }
+
+    .section {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 18px 40px rgba(17, 24, 39, 0.06);
+    }
+
+    .section-title {
+      margin: 0 0 16px;
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+
+    .guide {
+      margin: 0 0 20px;
+      color: #4b5563;
+      font-size: 0.98rem;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-weight: 600;
+      color: #1f2937;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      border: 1px solid #d1d5db;
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-size: 0.98rem;
+      background: #f9fafb;
+      color: #111827;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    input:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .result-card {
+      background: #f8fafc;
+      border: 1px solid #d1d5db;
+      border-radius: 18px;
+      padding: 20px;
+      min-height: 140px;
+    }
+
+    .result-card strong {
+      display: block;
+      font-size: 0.95rem;
+      color: #6b7280;
+      margin-bottom: 10px;
+    }
+
+    .result-card div {
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: #111827;
+    }
+
+    .formula {
+      margin-top: 16px;
+      padding: 18px;
+      border-radius: 16px;
+      background: #eef2ff;
+      color: #1e3a8a;
+      font-size: 0.96rem;
+      line-height: 1.7;
+    }
+
+    .formula span {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .textarea-wrapper {
+      position: relative;
+    }
+
+    .copy-button {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      border: none;
+      background: #2563eb;
+      color: #ffffff;
+      border-radius: 12px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: background 0.2s ease;
+    }
+
+    .copy-button:hover {
+      background: #1d4ed8;
+    }
+
+    .message {
+      margin-top: 18px;
+      padding: 16px 18px;
+      border-radius: 16px;
+      background: #fff4e5;
+      color: #92400e;
+      border: 1px solid #f5c28f;
+      font-size: 0.98rem;
+    }
+
+    .success {
+      background: #ecfdf5;
+      color: #166534;
+      border-color: #86efac;
+    }
+
+    @media (max-width: 820px) {
+      .form-grid,
+      .result-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .page {
+        padding: 18px;
+      }
+
+      .copy-button {
+        position: static;
+        width: 100%;
+        margin-top: 12px;
+      }
+
+      .textarea-wrapper {
+        display: grid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <h1>특가 승인 요청 생성기</h1>
+      <p>영업 담당자를 위한 로컬 특가 승인 요청 도구입니다. 입력값만 넣으면 할인율, 총액, 실적 대비 비율을 바로 계산하고 승인 요청 이메일 문안을 자동 생성합니다.</p>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">STEP 2 — 핵심 기능</h2>
+      <p class="guide">입력값이 변경될 때마다 결과가 즉시 갱신됩니다. 5분 이내에 특가 승인 요청서를 완성하도록 설계되었습니다.</p>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="customerName">고객사명</label>
+          <input id="customerName" type="text" placeholder="고객사를 입력하세요" />
+        </div>
+        <div class="form-group">
+          <label for="productName">제품명</label>
+          <input id="productName" type="text" placeholder="제품명을 입력하세요" />
+        </div>
+        <div class="form-group">
+          <label for="basePrice">실적 단가 (원)</label>
+          <input id="basePrice" type="number" min="0" placeholder="예: 120000" />
+        </div>
+        <div class="form-group">
+          <label for="offerPrice">제안 단가 (원)</label>
+          <input id="offerPrice" type="number" min="0" placeholder="예: 98000" />
+        </div>
+        <div class="form-group">
+          <label for="quantity">수량 (개)</label>
+          <input id="quantity" type="number" min="0" placeholder="예: 50" />
+        </div>
+        <div class="form-group full">
+          <label for="reason">요청 사유</label>
+          <textarea id="reason" placeholder="특가 요청의 목적과 배경을 입력하세요"></textarea>
+        </div>
+      </div>
+
+      <div id="alertMessage" class="message" style="display:none;"></div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">계산 결과</h2>
+      <div class="result-grid">
+        <div class="result-card">
+          <strong>할인율</strong>
+          <div id="discountRate">-</div>
+        </div>
+        <div class="result-card">
+          <strong>총액</strong>
+          <div id="totalAmount">-</div>
+        </div>
+        <div class="result-card">
+          <strong>실적가 대비 비율</strong>
+          <div id="ratioToBase">-</div>
+        </div>
+      </div>
+
+      <div class="formula">
+        <span>할인율 = (실적 단가 - 제안 단가) ÷ 실적 단가 × 100</span>
+        <span>총액 = 제안 단가 × 수량</span>
+        <span>실적가 대비 비율 = 제안 단가 ÷ 실적 단가 × 100</span>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">승인 요청 이메일 문안</h2>
+      <p class="guide">문안을 복사해 바로 이메일로 붙여넣을 수 있습니다.</p>
+      <div class="textarea-wrapper">
+        <textarea id="emailText" readonly></textarea>
+        <button id="copyButton" class="copy-button">문안 복사</button>
+      </div>
+      <div id="copyStatus" class="message success" style="display:none;"></div>
+    </section>
+  </main>
+
+  <script>
+    const customerName = document.getElementById('customerName');
+    const productName = document.getElementById('productName');
+    const basePrice = document.getElementById('basePrice');
+    const offerPrice = document.getElementById('offerPrice');
+    const quantity = document.getElementById('quantity');
+    const reason = document.getElementById('reason');
+
+    const discountRate = document.getElementById('discountRate');
+    const totalAmount = document.getElementById('totalAmount');
+    const ratioToBase = document.getElementById('ratioToBase');
+    const emailText = document.getElementById('emailText');
+    const alertMessage = document.getElementById('alertMessage');
+    const copyStatus = document.getElementById('copyStatus');
+    const copyButton = document.getElementById('copyButton');
+
+    const inputs = [customerName, productName, basePrice, offerPrice, quantity, reason];
+
+    function formatCurrency(value) {
+      return value.toLocaleString('ko-KR') + '원';
+    }
+
+    function showAlert(message) {
+      alertMessage.textContent = message;
+      alertMessage.style.display = 'block';
+    }
+
+    function hideAlert() {
+      alertMessage.textContent = '';
+      alertMessage.style.display = 'none';
+    }
+
+    function updateResults() {
+      const customer = customerName.value.trim();
+      const product = productName.value.trim();
+      const base = parseFloat(basePrice.value);
+      const offer = parseFloat(offerPrice.value);
+      const qty = parseInt(quantity.value, 10);
+      const reasonText = reason.value.trim();
+
+      const hasTextInputs = customer && product && reasonText;
+      const hasNumericInputs = !Number.isNaN(base) && !Number.isNaN(offer) && !Number.isNaN(qty);
+
+      if (!hasTextInputs || !hasNumericInputs) {
+        discountRate.textContent = '-';
+        totalAmount.textContent = '-';
+        ratioToBase.textContent = '-';
+        emailText.value = '';
+        showAlert('모든 입력 항목을 채운 뒤 결과를 확인하세요. 실적 단가, 제안 단가, 수량은 0보다 큰 값이어야 합니다.');
+        return;
+      }
+
+      if (base <= 0 || offer <= 0 || qty <= 0) {
+        discountRate.textContent = '-';
+        totalAmount.textContent = '-';
+        ratioToBase.textContent = '-';
+        emailText.value = '';
+        showAlert('실적 단가, 제안 단가, 수량은 모두 0보다 큰 값이어야 합니다.');
+        return;
+      }
+
+      hideAlert();
+
+      const discount = ((base - offer) / base) * 100;
+      const total = offer * qty;
+      const ratio = (offer / base) * 100;
+
+      discountRate.textContent = discount.toFixed(2) + '%';
+      totalAmount.textContent = formatCurrency(total);
+      ratioToBase.textContent = ratio.toFixed(2) + '%';
+
+      const resultSummary = `\n안녕하세요,\n\n아래와 같이 ${customer} 고객사의 ${product} 특가 승인을 요청드립니다.\n\n- 실적 단가: ${formatCurrency(base)}\n- 제안 단가: ${formatCurrency(offer)}\n- 수량: ${qty}개\n- 할인율: ${discount.toFixed(2)}%\n- 총액: ${formatCurrency(total)}\n- 실적가 대비 비율: ${ratio.toFixed(2)}%\n\n요청 사유:\n${reasonText}\n\n위 특가로 승인해 주시면 빠른 거래 성사 및 고객 유치에 도움이 될 것으로 판단됩니다.\n\n감사합니다.\n`;
+
+      emailText.value = resultSummary.trim();
+    }
+
+    function copyEmailText() {
+      if (!emailText.value) {
+        copyStatus.textContent = '복사할 문안이 없습니다.';
+        copyStatus.style.display = 'block';
+        copyStatus.classList.remove('success');
+        return;
+      }
+
+      navigator.clipboard.writeText(emailText.value)
+        .then(() => {
+          copyStatus.textContent = '이메일 문안이 복사되었습니다.';
+          copyStatus.style.display = 'block';
+          copyStatus.classList.add('success');
+        })
+        .catch(() => {
+          copyStatus.textContent = '복사에 실패했습니다. 텍스트를 수동으로 선택해주세요.';
+          copyStatus.style.display = 'block';
+          copyStatus.classList.remove('success');
+        });
+    }
+
+    inputs.forEach(input => {
+      input.addEventListener('input', updateResults);
+    });
+
+    copyButton.addEventListener('click', copyEmailText);
+
+    updateResults();
+  </script>
+</body>
+</html>
